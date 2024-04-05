@@ -36,12 +36,30 @@ def add_initial_names(conn):
 @app.route("/get_name", methods=["GET"])
 def get_name():
     conn = get_db_connection()
-    name = conn.execute("SELECT name FROM names LIMIT 1").fetchone()
-    conn.close()
-    if name:
-        return jsonify({"name": name["name"]})
-    else:
-        return jsonify({"message": "No names left"}), 404
+    # Start a transaction
+    conn.execute("BEGIN")
+    try:
+        # Fetch the first name and then put it at the end of the db, so other servers don't get it also
+        name_row = conn.execute("SELECT id, name FROM names ORDER BY id LIMIT 1").fetchone()
+        if name_row:
+            name = name_row["name"]
+            # Delete the fetched name
+            conn.execute("DELETE FROM names WHERE id = ?", (name_row["id"],))
+            # Re-insert the name at the end
+            conn.execute("INSERT INTO names (name) VALUES (?)", (name,))
+            # Commit the changes
+            conn.commit()
+            return jsonify({"name": name})
+        else:
+            # Rollback if no name was found
+            conn.rollback()
+            return jsonify({"message": "No names left"}), 404
+    except Exception as e:
+        # Rollback in case of any error
+        conn.rollback()
+        return jsonify({"error": "An error occurred while processing the name"}), 500
+    finally:
+        conn.close()
 
 
 @app.route("/name_finished", methods=["POST"])
