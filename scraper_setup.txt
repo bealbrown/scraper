@@ -1,22 +1,16 @@
 
-apt install python3-pip
-
 git clone https://github.com/bealbrown/scraper.git
 cd scraper
 
-git clone https://github.com/talleyhoe/google-image-scraper.git
-rm google-image-scraper/src/scraper.py 
-nano google-image-scraper/src/scraper.py
 
-
-nano downloader.py
-
-nano names.txt
-
-cd google-image-scraper/
+apt install python3-pip
+cd scraper/google-image-scraper/
 pip3 install -r requirements.txt 
 
 cd ..
+nano names.txt
+
+
 
 tmux
 

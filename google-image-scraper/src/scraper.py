@@ -68,6 +68,7 @@ def get_image_urls(query: str, page: int):
 
         if response.status_code == 200:
             json_text = response.content.decode("utf8").removeprefix(")]}'")
+
             json_data = json.loads(json_text)
             try:
                 results = json_data["ichunklite"]["results"]
@@ -145,29 +146,38 @@ def get_manifest(search_key: str, image_cnt: int):
     Returns:
     img_manifest -- an array of (id, url) tuples
     """
-    err_cnt = 0
-    err_limit = 5
 
-    img_manifest = {}
-    manifest_len = image_cnt
+    try:
+        err_cnt = 0
+        err_limit = 5
 
-    results_page = 0
-    search_key = sanitize_query(search_key)
-    while len(img_manifest.items()) < image_cnt:
-        try:
-            img_manifest.update(get_image_urls(search_key, results_page))
-            results_page += 1
-        except:
-            print(f"err_cnt: {err_cnt}")
-            err_cnt += 1
-        if err_cnt > err_limit:
-            eprint("Couldn't request all images")
-            manifest_len = len(img_manifest.items())
-            break
-    # For some versions of python3 hashmaps are unordered => non-deterministic
-    # This could be optimized with itertools
-    print("Found {} of {} image sources".format(manifest_len, image_cnt))
-    return list(img_manifest.items())[0:manifest_len]
+        img_manifest = {}
+        manifest_len = image_cnt
+
+        results_page = 0
+        search_key = sanitize_query(search_key)
+        # while len(img_manifest.items()) < image_cnt:
+        #     try:
+
+        #         results_page += 1
+        #     except:
+        #         print(f"err_cnt: {err_cnt}")
+        #         err_cnt += 1
+        #     if err_cnt > err_limit:
+        #         eprint("Couldn't request all images")
+        #         manifest_len = len(img_manifest.items())
+        #         break
+
+        img_manifest.update(get_image_urls(search_key, results_page))
+        manifest_len = len(img_manifest.items())
+
+        # For some versions of python3 hashmaps are unordered => non-deterministic
+        # This could be optimized with itertools
+        print("Found {} image sources, taking up to {}".format(manifest_len, image_cnt))
+        return list(img_manifest.items())[0:image_cnt]
+
+    except Exception as e:
+        print("failed to get manifest", e)
 
 
 ################################# main api ####################################
