@@ -81,9 +81,18 @@ def name_finished():
     print("removing", name, "which was completed")
     result = conn.execute("DELETE FROM names WHERE name = ?", (name,)).rowcount
     conn.commit()
+
+    # Count the remaining number of entries after deletion
+    remaining_count = conn.execute("SELECT COUNT(*) FROM names").fetchone()[0]
     conn.close()
+
+    print(f"Remaining entries in the database: {remaining_count}")  # Print the remaining count
+
     if result > 0:
-        return jsonify({"message": f"{name} removed"}), 200
+        return (
+            jsonify({"message": f"{name} removed", "remaining": remaining_count}),
+            200,
+        )  # Optionally, you can also return the remaining count in the response
     else:
         return jsonify({"error": "Name not found"}), 404
 
