@@ -77,6 +77,8 @@ def name_finished():
 
     name = request.json["name"]
     conn = get_db_connection()
+
+    print("removing", name, "which was completed")
     result = conn.execute("DELETE FROM names WHERE name = ?", (name,)).rowcount
     conn.commit()
     conn.close()
