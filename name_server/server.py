@@ -15,11 +15,22 @@ def init_db():
     conn = get_db_connection()
     conn.execute("""CREATE TABLE IF NOT EXISTS names (id INTEGER PRIMARY KEY, name TEXT NOT NULL)""")
 
-    names = ["Alice", "Bob", "Charlie", "Diana"]
-    conn.executemany("INSERT INTO names (name) VALUES (?)", [(name,) for name in names])
+    add_initial_names(conn)
 
     conn.commit()
     conn.close()
+
+
+def add_initial_names(conn):
+    try:
+        with open("input_names.txt", "r") as file:
+            names = [(line.strip(),) for line in file if line.strip()]
+        conn.executemany("INSERT INTO names (name) VALUES (?)", names)
+        conn.commit()
+    except FileNotFoundError:
+        print("The file 'input_names.txt' was not found.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 
 @app.route("/get_name", methods=["GET"])
