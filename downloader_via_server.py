@@ -35,6 +35,7 @@ def call_script_with_name():
             os.rmdir(dir_path)
         elif os.path.isdir(dir_path):
             print(f"Directory for {name} already exists and is not empty, skipping...")
+            notify_name_finished(name)
             return
 
         command = f"python3 ./google-image-scraper/src/main.py '\"{name}\" ceramics OR pot OR pottery OR pots -portrait -book -person -dealer' --count 30 -d {dir_path}"
