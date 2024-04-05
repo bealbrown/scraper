@@ -13,9 +13,17 @@ def get_db_connection():
 
 def init_db():
     conn = get_db_connection()
+    # Check if the table already exists
+    cursor = conn.cursor()
+    cursor.execute("""SELECT name FROM sqlite_master WHERE type='table' AND name='names';""")
+    exists = cursor.fetchone()
+
+    # Create the table if it doesn't exist
     conn.execute("""CREATE TABLE IF NOT EXISTS names (id INTEGER PRIMARY KEY, name TEXT NOT NULL)""")
 
-    add_initial_names(conn)
+    # If the table didn't exist, add initial names
+    if not exists:
+        add_initial_names(conn)
 
     conn.commit()
     conn.close()
