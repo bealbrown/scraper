@@ -14,8 +14,6 @@ DEBUG = False
 headers = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/110.0"}
 search_url = "https://www.google.com/search?q={}&tbm=isch&async=_id:islrg_c,_fmt:json&asearch=ichunklite&ijn={}"
 
-# Proxy configuration
-
 ############################# utility functions ###############################
 
 
@@ -63,6 +61,8 @@ def get_image_urls(query: str, page: int):
 
     all_images = {}
 
+    print("get_image_urls")
+
     try:
         response = requests.get(search_url.format(query, page), headers=headers)
 
@@ -82,7 +82,7 @@ def get_image_urls(query: str, page: int):
                     eprint(err)
         else:
             if DEBUG:
-                eprint("ERROR: Status code {} for page {} {}.".format(response.status_code, response, page))
+                eprint("ERROR: Status code {} for page {}.".format(response.status_code, page))
 
     except Exception as err:
         if DEBUG:
@@ -124,14 +124,13 @@ def download_image(img_url: str, file_path: str):
                 file.write(img_url)
 
             return 0
-
         else:
             if DEBUG:
                 eprint("ERROR: Bad content-type\n{}".format(response_content_type))
             return 1
     else:
         if DEBUG:
-            eprint("ERROR: Status code {} for url {}.".format(response.status_code, img_url))
+            eprint("ERROR: Status code {} for url {}.".format(response.status_code, url))
         return 1
 
 
