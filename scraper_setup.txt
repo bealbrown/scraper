@@ -1,7 +1,9 @@
-mkdir scraper
-cd scraper
+
 apt install python3-pip
-cd scraper/
+
+git clone https://github.com/bealbrown/scraper.git
+cd scraper
+
 git clone https://github.com/talleyhoe/google-image-scraper.git
 rm google-image-scraper/src/scraper.py 
 nano google-image-scraper/src/scraper.py
